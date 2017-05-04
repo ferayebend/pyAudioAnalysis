@@ -3,6 +3,8 @@
 
 *This doc contains general info. Click [here] (https://github.com/tyiannak/pyAudioAnalysis/wiki) for the complete wiki*
 
+This is a fork of [pyAudioAnalysis] (https://github.com/tyiannak/pyAudioAnalysis/), which is intended to be a lightweight, packageable version which complies with PEP8.
+
 ## News
  * Check out [paura](https://github.com/tyiannak/paura) a python script for realtime recording and analysis of audio data
  * January 2017: *mp3* files are also supported for single file feature extraction, classification and segmentation (using pydub library)
@@ -30,7 +32,7 @@ pip install numpy matplotlib scipy sklearn hmmlearn simplejson eyed3 pydub
 ```
  * Clone the source of this library: 
  ```
-git clone https://github.com/tyiannak/pyAudioAnalysis.git
+git clone https://github.com/ferayebend/sciaudio.git
 ```
 
 ## An audio classification example
