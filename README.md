@@ -1,9 +1,9 @@
 
 # <img src="icon.png" align="left" height="130"/> A Python library for audio feature extraction, classification, segmentation and applications
 
-*This doc contains general info. Click [here] (https://github.com/tyiannak/pyAudioAnalysis/wiki) for the complete wiki*
+*This doc contains general info. Click [here](https://github.com/tyiannak/pyAudioAnalysis/wiki) for the complete wiki*
 
-This is a fork of [pyAudioAnalysis] (https://github.com/tyiannak/pyAudioAnalysis/), which is intended to be a lightweight, packageable version which complies with PEP8.
+This is a fork of [pyAudioAnalysis](https://github.com/tyiannak/pyAudioAnalysis/), which is intended to be a lightweight, packageable version which complies with PEP8.
 
 ## News
  * Check out [paura](https://github.com/tyiannak/paura) a python script for realtime recording and analysis of audio data
