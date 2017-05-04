@@ -1,5 +1,6 @@
 import glob, os
-import audioBasicIO, sys, csv
+from sciaudio import audioBasicIO
+import sys, csv
 import scipy.io.wavfile as wavfile
 
 
@@ -23,7 +24,7 @@ def annotation2files(wavFile, csvFile):
             label = "%s_%s_%.2f_%.2f.wav" % (wavFile, row[2], T1, T2)
             label = label.replace(" ", "_")
             xtemp = x[int(round(T1*Fs)):int(round(T2*Fs))]            
-            print T1, T2, label, xtemp.shape
+            print(T1, T2, label, xtemp.shape)
             wavfile.write(label, Fs, xtemp)  
 
 def main(argv):
@@ -42,7 +43,7 @@ def main(argv):
             if not os.path.isfile(wavFile):
                 wavFile = os.path.splitext(anFile)[0] + ".mp3"
                 if not os.path.isfile(wavFile):
-                    print "Audio file not found!"
+                    print("Audio file not found!")
                     return
             annotation2files(wavFile, anFile)
 

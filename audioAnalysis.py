@@ -7,17 +7,16 @@ import glob
 import scipy
 import subprocess
 import wave
-import cPickle
+import pickle
 import threading
 import shutil
 import ntpath
 import matplotlib.pyplot as plt
-import audioFeatureExtraction as aF
-import audioTrainTest as aT
-import audioSegmentation as aS
-import audioVisualization as aV
-import audioBasicIO
-import utilities as uT
+from sciaudio import audioFeatureExtraction as aF
+from sciaudio import audioTrainTest as aT
+from sciaudio import audioSegmentation as aS
+from sciaudio import audioBasicIO
+from sciaudio import utilities as uT
 import scipy.io.wavfile as wavfile
 import matplotlib.patches
 
@@ -50,8 +49,8 @@ def beatExtractionWrapper(wavFileName, plot):
     [Fs, x] = audioBasicIO.readAudioFile(wavFileName)
     F = aF.stFeatureExtraction(x, Fs, 0.050 * Fs, 0.050 * Fs)
     BPM, ratio = aF.beatExtraction(F, 0.050, plot)
-    print "Beat: {0:d} bpm ".format(int(BPM))
-    print "Ratio: {0:.2f} ".format(ratio)
+    print("Beat: {0:d} bpm ".format(int(BPM)))
+    print("Ratio: {0:.2f} ".format(ratio))
 
 
 def featureExtractionDirWrapper(directory, mtWin, mtStep, stWin, stStep):
@@ -63,7 +62,8 @@ def featureExtractionDirWrapper(directory, mtWin, mtStep, stWin, stStep):
 def featureVisualizationDirWrapper(directory):
     if not os.path.isdir(directory):
         raise Exception("Input folder not found!")
-    aV.visualizeFeaturesFolder(directory, "pca", "")
+    pass
+    #aV.visualizeFeaturesFolder(directory, "pca", "")
     #aV.visualizeFeaturesFolder(directory, "lda", "artist")
 
 
@@ -102,10 +102,10 @@ def classifyFileWrapper(inputFile, modelType, modelName):
         raise Exception("Input audio file not found!")
 
     [Result, P, classNames] = aT.fileClassification(inputFile, modelName, modelType)    
-    print "{0:s}\t{1:s}".format("Class", "Probability")
+    print("{0:s}\t{1:s}".format("Class", "Probability"))
     for i, c in enumerate(classNames):
-        print "{0:s}\t{1:.2f}".format(c, P[i])
-    print "Winner class: " + classNames[int(Result)]
+        print("{0:s}\t{1:.2f}".format(c, P[i]))
+    print("Winner class: " + classNames[int(Result)])
 
 
 def regressionFileWrapper(inputFile, modelType, modelName):
@@ -114,7 +114,7 @@ def regressionFileWrapper(inputFile, modelType, modelName):
 
     R, regressionNames = aT.fileRegression(inputFile, modelName, modelType)
     for i in range(len(R)):
-        print "{0:s}\t{1:.3f}".format(regressionNames[i], R[i])
+        print("{0:s}\t{1:.3f}".format(regressionNames[i], R[i]))
 
 
 def classifyFolderWrapper(inputFolder, modelType, modelName, outputMode=False):
@@ -127,7 +127,7 @@ def classifyFolderWrapper(inputFolder, modelType, modelName, outputMode=False):
         wavFilesList.extend(glob.glob(os.path.join(inputFolder, files)))
     wavFilesList = sorted(wavFilesList)
     if len(wavFilesList) == 0:
-        print "No WAV files found!"
+        print("No WAV files found!")
         return
 
     Results = []
@@ -136,13 +136,13 @@ def classifyFolderWrapper(inputFolder, modelType, modelName, outputMode=False):
         Result = int(Result)
         Results.append(Result)
         if outputMode:
-            print "{0:s}\t{1:s}".format(wavFile, classNames[Result])
+            print("{0:s}\t{1:s}".format(wavFile, classNames[Result]))
     Results = numpy.array(Results)
 
     # print distribution of classes:
     [Histogram, _] = numpy.histogram(Results, bins=numpy.arange(len(classNames) + 1))
     for i, h in enumerate(Histogram):
-        print "{0:20s}\t\t{1:d}".format(classNames[i], h)
+        print("{0:20s}\t\t{1:d}".format(classNames[i], h))
 
 
 def regressionFolderWrapper(inputFolder, modelType, modelName):
@@ -156,7 +156,7 @@ def regressionFolderWrapper(inputFolder, modelType, modelName):
     wavFilesList.extend(glob.glob(strFilePattern))
     wavFilesList = sorted(wavFilesList)
     if len(wavFilesList) == 0:
-        print "No WAV files found!"
+        print("No WAV files found!")
         return
     Results = []
     for wavFile in wavFilesList:
@@ -175,10 +175,10 @@ def regressionFolderWrapper(inputFolder, modelType, modelName):
 
 def trainHMMsegmenter_fromfile(wavFile, gtFile, hmmModelName, mtWin, mtStep):
     if not os.path.isfile(wavFile):
-        print "Error: wavfile does not exist!"
+        print("Error: wavfile does not exist!")
         return
     if not os.path.isfile(gtFile):
-        print "Error: groundtruth does not exist!"
+        print("Error: groundtruth does not exist!")
         return
 
     aS.trainHMM_fromFile(wavFile, gtFile, hmmModelName, mtWin, mtStep)
@@ -251,8 +251,8 @@ def thumbnailWrapper(inputFile, thumbnailWrapperSize):
         thumbnailWrapperFileName2 = inputFile.replace(".mp3", "_thumb2.mp3")        
     wavfile.write(thumbnailWrapperFileName1, Fs, x[int(Fs * A1):int(Fs * A2)])
     wavfile.write(thumbnailWrapperFileName2, Fs, x[int(Fs * B1):int(Fs * B2)])
-    print "1st thumbnailWrapper (stored in file {0:s}): {1:4.1f}sec -- {2:4.1f}sec".format(thumbnailWrapperFileName1, A1, A2)
-    print "2nd thumbnailWrapper (stored in file {0:s}): {1:4.1f}sec -- {2:4.1f}sec".format(thumbnailWrapperFileName2, B1, B2)
+    print("1st thumbnailWrapper (stored in file {0:s}): {1:4.1f}sec -- {2:4.1f}sec".format(thumbnailWrapperFileName1, A1, A2))
+    print("2nd thumbnailWrapper (stored in file {0:s}): {1:4.1f}sec -- {2:4.1f}sec".format(thumbnailWrapperFileName2, B1, B2))
 
     # Plot self-similarity matrix:
     fig = plt.figure()
