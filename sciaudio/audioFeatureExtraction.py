@@ -11,8 +11,6 @@ from scipy.fftpack import rfft
 from scipy.fftpack import fft
 from scipy.fftpack.realtransforms import dct
 from scipy.signal import fftconvolve
-from matplotlib.mlab import find
-import matplotlib.pyplot as plt
 from scipy import linalg as la
 from . import audioTrainTest as aT
 from . import audioBasicIO
@@ -282,17 +280,6 @@ def stChromaFeatures(X, fs, nChroma, nFreqsPerChroma):
     finalC = numpy.matrix(numpy.sum(C2, axis=0)).T
     finalC /= spec.sum()
 
-#    ax = plt.gca()
-#    plt.hold(False)
-#    plt.plot(finalC)
-#    ax.set_xticks(range(len(chromaNames)))
-#    ax.set_xticklabels(chromaNames)
-#    xaxis = numpy.arange(0, 0.02, 0.01);
-#    ax.set_yticks(range(len(xaxis)))
-#    ax.set_yticklabels(xaxis)
-#    plt.show(block=False)
-#    plt.draw()
-
     return chromaNames, finalC
 
 
@@ -309,6 +296,8 @@ def stChromagram(signal, Fs, Win, Step, PLOT=False):
         PLOT:        flag, 1 if results are to be ploted
     RETURNS:
     """
+    if (PLOT):
+        raise NotImplementedError("stChromagram does not plot")
     Win = int(Win)
     Step = int(Step)
     signal = numpy.double(signal)
@@ -339,29 +328,6 @@ def stChromagram(signal, Fs, Win, Step, PLOT=False):
             chromaGram = numpy.vstack((chromaGram, C.T))
     FreqAxis = chromaNames
     TimeAxis = [(t * Step) / Fs for t in range(chromaGram.shape[0])]
-
-    if (PLOT):
-        fig, ax = plt.subplots()
-        chromaGramToPlot = chromaGram.transpose()[::-1, :]
-        Ratio = chromaGramToPlot.shape[1] / (3*chromaGramToPlot.shape[0])        
-        if Ratio < 1:
-            Ratio = 1
-        chromaGramToPlot = numpy.repeat(chromaGramToPlot, Ratio, axis=0)
-        imgplot = plt.imshow(chromaGramToPlot)
-        Fstep = int(nfft / 5.0)
-#        FreqTicks = range(0, int(nfft) + Fstep, Fstep)
-#        FreqTicksLabels = [str(Fs/2-int((f*Fs) / (2*nfft))) for f in FreqTicks]
-        ax.set_yticks(range(Ratio / 2, len(FreqAxis) * Ratio, Ratio))
-        ax.set_yticklabels(FreqAxis[::-1])
-        TStep = countFrames / 3
-        TimeTicks = range(0, countFrames, TStep)
-        TimeTicksLabels = ['%.2f' % (float(t * Step) / Fs) for t in TimeTicks]
-        ax.set_xticks(TimeTicks)
-        ax.set_xticklabels(TimeTicksLabels)
-        ax.set_xlabel('time (secs)')
-        imgplot.set_cmap('jet')
-        plt.colorbar()
-        plt.show()
 
     return (chromaGram, TimeAxis, FreqAxis)
 
@@ -404,6 +370,9 @@ def beatExtraction(stFeatures, winSize, PLOT=False):
     # Features that are related to the beat tracking task:
     toWatch = [0, 1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]
 
+    if PLOT:
+        raise NotImplementedError("beatExtraction does not plot")
+
     maxBeatTime = int(round(2.0 / winSize))
     HistAll = numpy.zeros((maxBeatTime,))
     for ii, i in enumerate(toWatch):                                        # for each feature
@@ -416,18 +385,6 @@ def beatExtraction(stFeatures, winSize, PLOT=False):
         HistCenters = (HistEdges[0:-1] + HistEdges[1::]) / 2.0
         HistTimes = HistTimes.astype(float) / stFeatures.shape[1]
         HistAll += HistTimes
-        if PLOT:
-            plt.subplot(9, 2, ii + 1)
-            plt.plot(stFeatures[i, :], 'k')
-            for k in pos1:
-                plt.plot(k, stFeatures[i, k], 'k*')
-            f1 = plt.gca()
-            f1.axes.get_xaxis().set_ticks([])
-            f1.axes.get_yaxis().set_ticks([])
-
-    if PLOT:
-        plt.show(block=False)
-        plt.figure()
 
     # Get beat as the argmax of the agregated histogram:
     I = numpy.argmax(HistAll)
@@ -435,16 +392,6 @@ def beatExtraction(stFeatures, winSize, PLOT=False):
     BPM = BPMs[I]
     # ... and the beat ratio:
     Ratio = HistAll[I] / HistAll.sum()
-
-    if PLOT:
-        # filter out >500 beats from plotting:
-        HistAll = HistAll[BPMs < 500]
-        BPMs = BPMs[BPMs < 500]
-
-        plt.plot(BPMs, HistAll, 'k')
-        plt.xlabel('Beats per minute')
-        plt.ylabel('Freq Count')
-        plt.show(block=True)
 
     return BPM, Ratio
 
@@ -462,6 +409,8 @@ def stSpectogram(signal, Fs, Win, Step, PLOT=False):
         PLOT:        flag, 1 if results are to be ploted
     RETURNS:
     """
+    if PLOT:
+        raise NotImplementedError("stSpectogram does not plot")
     Win = int(Win)
     Step = int(Step)
     signal = numpy.double(signal)
@@ -491,25 +440,6 @@ def stSpectogram(signal, Fs, Win, Step, PLOT=False):
 
     FreqAxis = [((f + 1) * Fs) / (2 * nfft) for f in range(specgram.shape[1])]
     TimeAxis = [(t * Step) / Fs for t in range(specgram.shape[0])]
-
-    if (PLOT):
-        fig, ax = plt.subplots()
-        imgplot = plt.imshow(specgram.transpose()[::-1, :])
-        Fstep = int(nfft / 5.0)
-        FreqTicks = range(0, int(nfft) + Fstep, Fstep)
-        FreqTicksLabels = [str(Fs / 2 - int((f * Fs) / (2 * nfft))) for f in FreqTicks]
-        ax.set_yticks(FreqTicks)
-        ax.set_yticklabels(FreqTicksLabels)
-        TStep = countFrames/3
-        TimeTicks = range(0, countFrames, TStep)
-        TimeTicksLabels = ['%.2f' % (float(t * Step) / Fs) for t in TimeTicks]
-        ax.set_xticks(TimeTicks)
-        ax.set_xticklabels(TimeTicksLabels)
-        ax.set_xlabel('time (secs)')
-        ax.set_ylabel('freq (Hz)')
-        imgplot.set_cmap('jet')
-        plt.colorbar()
-        plt.show()
 
     return (specgram, TimeAxis, FreqAxis)
 

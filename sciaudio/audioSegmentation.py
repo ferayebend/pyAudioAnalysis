@@ -6,10 +6,7 @@ import os
 from . import audioFeatureExtraction as aF
 from . import audioTrainTest as aT
 from . import audioBasicIO
-import matplotlib.pyplot as plt
 from scipy.spatial import distance
-import matplotlib.pyplot as plt
-import matplotlib.cm as cm
 import sklearn.discriminant_analysis
 import csv
 import os.path
@@ -164,7 +161,7 @@ def readSegmentGT(gtFile):
     return numpy.array(segStart), numpy.array(segEnd), segLabel
 
 
-def plotSegmentationResults(flagsInd, flagsIndGT, classNames, mtStep, ONLY_EVALUATE=False):
+def plotSegmentationResults(flagsInd, flagsIndGT, classNames, mtStep, ONLY_EVALUATE=True):
     '''
     This function plots statistics on the classification-segmentation results produced either by the fix-sized supervised method or the HMM method.
     It also computes the overall accuracy achieved by the respective method if ground-truth is available.
@@ -178,55 +175,7 @@ def plotSegmentationResults(flagsInd, flagsIndGT, classNames, mtStep, ONLY_EVALU
         accuracy = -1
 
     if not ONLY_EVALUATE:
-        Duration = segs[-1, 1]
-        SPercentages = numpy.zeros((len(classNames), 1))
-        Percentages = numpy.zeros((len(classNames), 1))
-        AvDurations = numpy.zeros((len(classNames), 1))
-
-        for iSeg in range(segs.shape[0]):
-            SPercentages[classNames.index(classes[iSeg])] += (segs[iSeg, 1]-segs[iSeg, 0])
-
-        for i in range(SPercentages.shape[0]):
-            Percentages[i] = 100.0 * SPercentages[i] / Duration
-            S = sum(1 for c in classes if c == classNames[i])
-            if S > 0:
-                AvDurations[i] = SPercentages[i] / S
-            else:
-                AvDurations[i] = 0.0
-
-        for i in range(Percentages.shape[0]):
-            print(classNames[i], Percentages[i], AvDurations[i])
-
-        font = {'size': 10}
-        plt.rc('font', **font)
-
-        fig = plt.figure()
-        ax1 = fig.add_subplot(211)
-        ax1.set_yticks(numpy.array(range(len(classNames))))
-        ax1.axis((0, Duration, -1, len(classNames)))
-        ax1.set_yticklabels(classNames)
-        ax1.plot(numpy.array(range(len(flagsInd))) * mtStep + mtStep / 2.0, flagsInd)
-        if flagsIndGT.shape[0] > 0:
-            ax1.plot(numpy.array(range(len(flagsIndGT))) * mtStep + mtStep / 2.0, flagsIndGT + 0.05, '--r')
-        plt.xlabel("time (seconds)")
-        if accuracy >= 0:
-            plt.title('Accuracy = {0:.1f}%'.format(100.0 * accuracy))
-
-        ax2 = fig.add_subplot(223)
-        plt.title("Classes percentage durations")
-        ax2.axis((0, len(classNames) + 1, 0, 100))
-        ax2.set_xticks(numpy.array(range(len(classNames) + 1)))
-        ax2.set_xticklabels([" "] + classNames)
-        ax2.bar(numpy.array(range(len(classNames))) + 0.5, Percentages)
-
-        ax3 = fig.add_subplot(224)
-        plt.title("Segment average duration per class")
-        ax3.axis((0, len(classNames)+1, 0, AvDurations.max()))
-        ax3.set_xticks(numpy.array(range(len(classNames) + 1)))
-        ax3.set_xticklabels([" "] + classNames)
-        ax3.bar(numpy.array(range(len(classNames))) + 0.5, AvDurations)
-        fig.tight_layout()
-        plt.show()
+        raise NotImplemented("plotSegmentationResults only calculates accuracy")
     return accuracy
 
 
@@ -667,21 +616,7 @@ def silenceRemoval(x, Fs, stWin, stStep, smoothWindow=0.5, Weight=0.5, plot=Fals
     segmentLimits = segmentLimits2
 
     if plot:
-        timeX = numpy.arange(0, x.shape[0] / float(Fs), 1.0 / Fs)
-
-        plt.subplot(2, 1, 1)
-        plt.plot(timeX, x)
-        for s in segmentLimits:
-            plt.axvline(x=s[0])
-            plt.axvline(x=s[1])
-        plt.subplot(2, 1, 2)
-        plt.plot(numpy.arange(0, ProbOnset.shape[0] * stStep, stStep), ProbOnset)
-        plt.title('Signal')
-        for s in segmentLimits:
-            plt.axvline(x=s[0])
-            plt.axvline(x=s[1])
-        plt.title('SVM Probability')
-        plt.show()
+        raise NotImplementedError("silence removal does not plot")
 
     return segmentLimits
 
@@ -889,33 +824,9 @@ def speakerDiarization(fileName, numOfSpeakers, mtSize=2.0, mtStep=0.2, stWin=0.
         [segStart, segEnd, segLabels] = readSegmentGT(gtFile)                    # read GT data
         flagsGT, classNamesGT = segs2flags(segStart, segEnd, segLabels, mtStep)            # convert to flags
 
-    if PLOT:
-        fig = plt.figure()    
-        if numOfSpeakers>0:
-            ax1 = fig.add_subplot(111)
-        else:
-            ax1 = fig.add_subplot(211)
-        ax1.set_yticks(numpy.array(range(len(classNames))))
-        ax1.axis((0, Duration, -1, len(classNames)))
-        ax1.set_yticklabels(classNames)
-        ax1.plot(numpy.array(range(len(cls)))*mtStep+mtStep/2.0, cls)
-
     if os.path.isfile(gtFile):
-        if PLOT:
-            ax1.plot(numpy.array(range(len(flagsGT)))*mtStep+mtStep/2.0, flagsGT, 'r')
         purityClusterMean, puritySpeakerMean = evaluateSpeakerDiarization(cls, flagsGT)
         print("{0:.1f}\t{1:.1f}".format(100*purityClusterMean, 100*puritySpeakerMean))
-        if PLOT:
-            plt.title("Cluster purity: {0:.1f}% - Speaker purity: {1:.1f}%".format(100*purityClusterMean, 100*puritySpeakerMean) )
-    if PLOT:
-        plt.xlabel("time (seconds)")
-        #print sRange, silAll    
-        if numOfSpeakers<=0:
-            plt.subplot(212)
-            plt.plot(sRange, silAll)
-            plt.xlabel("number of clusters");
-            plt.ylabel("average clustering's sillouette");
-        plt.show()
     return cls
     
 def speakerDiarizationEvaluateScript(folderName, LDAs):
@@ -1010,8 +921,6 @@ def musicThumbnailing(x, Fs, shortTermSize=1.0, shortTermStep=0.5, thumbnailSize
 
     maxVal = numpy.max(S)        
     [I, J] = numpy.unravel_index(S.argmax(), S.shape)
-    #plt.imshow(S)
-    #plt.show()
     # expand:
     i1 = I; i2 = I
     j1 = J; j2 = J

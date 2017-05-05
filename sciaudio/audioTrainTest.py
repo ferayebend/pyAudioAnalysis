@@ -11,8 +11,6 @@ import csv
 import ntpath
 from . import audioFeatureExtraction as aF
 from . import audioBasicIO
-from matplotlib.mlab import find
-import matplotlib.pyplot as plt
 import scipy.io as sIO
 from scipy import linalg as la
 from scipy.spatial import distance
@@ -1067,12 +1065,6 @@ def lda(data, labels, redDim):
     #print evals, w
 
     newData = numpy.dot(data, w)
-    #for i in range(newData.shape[0]):
-    #    plt.text(newData[i,0],newData[i,1],str(labels[i]))
-
-    #plt.xlim([newData[:,0].min(), newData[:,0].max()])
-    #plt.ylim([newData[:,1].min(), newData[:,1].max()])
-    #plt.show()
     return newData, w
 
 
