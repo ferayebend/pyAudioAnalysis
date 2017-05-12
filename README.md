@@ -7,7 +7,7 @@ This is a fork of [pyAudioAnalysis](https://github.com/tyiannak/pyAudioAnalysis/
 
 ## News
  * [BK] Ported to Python3 
- * [TG ]Check out [paura](https://github.com/tyiannak/paura) a python script for realtime recording and analysis of audio data
+ * [TG] Check out [paura](https://github.com/tyiannak/paura) a python script for realtime recording and analysis of audio data
  * [TG] January 2017: *mp3* files are also supported for single file feature extraction, classification and segmentation (using pydub library)
  * [TG] September 2016: New segment classifiers (from sklearn): random forests, extra trees and gradient boosting
  * [TG] August 2016: Update: mlpy no longer used. SVMs, PCA, etc performed through scikit-learn 
